@@ -1,9 +1,10 @@
 import './App.css';
-import { Button, ChakraProvider, Link } from '@chakra-ui/react';
+import { Button, Center, ChakraProvider, Link } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import SpotifyWebApi from 'spotify-web-api-js';
 import TrackSearch from './components/trackSearch';
 import { loginUrl } from './components/spotifyLogin';
+import InfoDrawer from './components/infoDrawer';
 const spotify = new SpotifyWebApi();
 
 function App() {
@@ -12,8 +13,10 @@ function App() {
   const SpotifyButton = () => {
     if (spotifyToken === "") {
       console.log(loginUrl)
-      return (        
-        <Link colorScheme='green' variant={'solid'} href={loginUrl}>Login with spotify</Link>
+      return (
+        <Center>
+          <Link colorScheme='green' variant='solid' href={loginUrl}>Login with spotify</Link>
+        </Center>
       )
     } else {
       return (
@@ -45,6 +48,7 @@ function App() {
 
   return (
     <ChakraProvider>
+      <InfoDrawer/>
       <SpotifyButton/>
     </ChakraProvider>
   );
