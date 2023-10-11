@@ -1,4 +1,3 @@
-import { Component } from "react";
 import {Button, Drawer, DrawerOverlay, DrawerCloseButton, DrawerHeader, DrawerBody, DrawerContent, useDisclosure} from '@chakra-ui/react'
 
 function InfoDrawer() {

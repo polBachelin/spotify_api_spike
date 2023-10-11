@@ -1,5 +1,5 @@
 import './App.css';
-import { Button, Center, ChakraProvider, Link } from '@chakra-ui/react';
+import { Center, ChakraProvider, Link } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import SpotifyWebApi from 'spotify-web-api-js';
 import TrackSearch from './components/trackSearch';
@@ -44,7 +44,7 @@ function App() {
       setSpotifyToken(_spotifyToken)
       spotify.setAccessToken(_spotifyToken)
     }
-  })
+  }, [spotifyToken])
 
   return (
     <ChakraProvider>

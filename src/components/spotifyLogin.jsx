@@ -1,4 +1,3 @@
-import React from "react";
 
 export const authEndpoint = "https://accounts.spotify.com/authorize";
 

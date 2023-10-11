@@ -1,4 +1,4 @@
-import { Box, Button, Center, Heading, Input, Link, ListItem, Text, Tooltip, UnorderedList } from '@chakra-ui/react';
+import { Box, Button, Center, Heading, Input, Link, ListItem, Tooltip, UnorderedList } from '@chakra-ui/react';
 import React, { Component } from 'react';
 import SpotifyWebApi from 'spotify-web-api-js';
 
