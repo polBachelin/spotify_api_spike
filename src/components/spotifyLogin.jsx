@@ -2,7 +2,7 @@
 export const authEndpoint = "https://accounts.spotify.com/authorize";
 
 const redirectUri = "https://polbachelin.github.io/spotify_api_spike/"
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const CLIENT_ID = "1f2e8117b6864eaaa43433e3c1b971d0"
 
 console.log(process.env)
 const scopes = [
