@@ -1,7 +1,7 @@
 
 export const authEndpoint = "https://accounts.spotify.com/authorize";
 
-const redirectUri = "http://localhost:3000/"
+const redirectUri = "https://polbachelin.github.io/spotify_api_spike/"
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 
 console.log(process.env)
