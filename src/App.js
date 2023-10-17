@@ -12,7 +12,6 @@ function App() {
 
   const SpotifyButton = () => {
     if (spotifyToken === "") {
-      console.log(loginUrl)
       return (
         <Center>
           <Link colorScheme='green' variant='solid' href={loginUrl}>Login with spotify</Link>

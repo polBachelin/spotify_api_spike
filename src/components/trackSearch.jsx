@@ -1,57 +1,54 @@
-import { Box, Button, Center, Heading, Input, Link, ListItem, Tooltip, UnorderedList } from '@chakra-ui/react';
-import React, { Component } from 'react';
+import { Text, Box, Button, Center, Heading, Input, Link, ListItem, UnorderedList, useToast } from '@chakra-ui/react';
+import React, { useState } from 'react';
 import SpotifyWebApi from 'spotify-web-api-js';
 
 // Create an instance of the SpotifyWebApi object
 const spotifyApi = new SpotifyWebApi();
 
-class TrackSearch extends Component {
-  constructor() {
-    super();
-    this.state = {
-      trackInput: '',
-      trackArtist: '',
-      trackName: '',
-      audioFeatures: {},
-      trackLink: ''
-    };
-  }
-
-  handleTrackInput = (event) => {
-    this.setState({ trackInput: event.target.value });
+const TrackSearch = () => {
+  const [track, setTrack] = useState({name: '', id: '', external_urls: {spotify: ''}});
+  const [audioFeat, setAudioFeatures] = useState({});
+  const [trackInput, setTrackInput] = useState('');
+  const [trackArtistInput, setTrackArtistInput] = useState('');
+  const toast = useToast();
+  
+  const handleTrackInput = (event) => {
+    setTrackInput(event.target.value)
   };
 
-  handleArtistInput = (event) => {
-    this.setState({ trackArtist: event.target.value });
+  const handleArtistInput = (event) => {
+    setTrackArtistInput(event.target.value)
   };
 
-  handleSearch = async () => {
-    const { trackInput, trackArtist } = this.state;
-
+  const handleSearch = async () => {
     try {
       // Search for tracks based on the query
-      const searchResult = await spotifyApi.searchTracks(`artist:${trackArtist} track:${trackInput}`);
+      const searchResult = await spotifyApi.searchTracks(`artist:${trackArtistInput} track:${trackInput}`);
 
-      // Extract the first track from the search results (you may want to handle multiple results)
+      console.log(searchResult)
       const track = searchResult.tracks.items[0];
-
-      const audioFeatures = await spotifyApi.getAudioFeaturesForTrack(track.id);
+      console.log(track)
 
       if (track) {
+        const audioFeatures = await spotifyApi.getAudioFeaturesForTrack(track.id);
         console.log(track)
         console.log(audioFeatures)
-        this.setState({ trackName: track.name, audioFeatures: audioFeatures, trackLink: track.external_urls.spotify });
+        setTrack(track)
+        setAudioFeatures(audioFeatures)
       } else {
-        this.setState({ trackName: 'Track not found' });
+        console.log("other undefined")
+        toast({
+          title: "Error",
+          description: "Track not found, make sure to specify the correct artist name and song",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        })
       }
     } catch (error) {
       console.error('Error:', error.message);
     }
   };
-
-
-  render() {
-    const { trackInput, trackArtist, trackName, audioFeatures, trackLink } = this.state;
 
     const CustomItem = React.forwardRef(({ children, ...rest }, ref) => (
         <ListItem>{children}</ListItem>
@@ -59,55 +56,55 @@ class TrackSearch extends Component {
     
     return (
       <Box>
-        <Box>
-            <Center>
-                <Input 
-                    w={{ base: "100%", md: "300px" }}
-                    size='md'
-                    placeholder="Enter track name"
-                    value={trackInput}
-                    onChange={this.handleTrackInput}
-                />
-                <Input 
-                    w={{ base: "100%", md: "300px" }}
-                    size='md'
-                    placeholder="Enter artist name"
-                    value={trackArtist}
-                    onChange={this.handleArtistInput}
-                />
-                <Button onClick={this.handleSearch}>Search</Button>
-            </Center>
-        </Box>
+        <Center>
+            <Input 
+                w={{ base: "100%", md: "300px" }}
+                size='md'
+                placeholder="Enter track name"
+                value={trackInput}
+                onChange={handleTrackInput}
+            />
+            <Input 
+                w={{ base: "100%", md: "300px" }}
+                size='md'
+                placeholder="Enter artist name"
+                value={trackArtistInput}
+                onChange={handleArtistInput}
+            />
+            <Button onClick={handleSearch}>Search</Button>
+        </Center>
         <br></br>
         <br></br>
         <Center>
-            <Heading>Audio features of the track {trackName} by {trackArtist} </Heading>
+            <Heading>Audio features of the track {track.name} </Heading>
         </Center>
         <Center>
-            <Link href={trackLink}>Link to song</Link>
+            <Link href={track.external_urls.spotify}>Link to song</Link>
         </Center>
+        <br></br>
+        <Center>
+          <Text>Track ID : {track.id}</Text>
+        </Center>
+        <br></br>
         <br></br>
         <Center>
           <UnorderedList>
-            <Tooltip label='Hello'>
-                <CustomItem>Acousticness : {audioFeatures.acousticness}</CustomItem>
-            </Tooltip>
-            <ListItem>Danceability : {audioFeatures.danceability}</ListItem>
-            <ListItem>Duration ms : {audioFeatures.duration_ms}</ListItem>
-            <ListItem>Energy : {audioFeatures.energy}</ListItem>
-            <ListItem>Instrumentalness : {audioFeatures.instrumentalness}</ListItem>
-            <ListItem>Key : {audioFeatures.key}</ListItem>
-            <ListItem>Liveness : {audioFeatures.liveness}</ListItem>
-            <ListItem>Loudness : {audioFeatures.loudness}</ListItem>
-            <ListItem>Speechiness : {audioFeatures.speechiness}</ListItem>
-            <ListItem>Tempo : {audioFeatures.tempo}</ListItem>
-            <ListItem>Time signature : {audioFeatures.time_signature}</ListItem>
-            <ListItem>Valence : {audioFeatures.valence}</ListItem>
+            <CustomItem>Acousticness : {audioFeat.acousticness}</CustomItem>
+            <ListItem>Danceability : {audioFeat.danceability}</ListItem>
+            <ListItem>Duration ms : {audioFeat.duration_ms}</ListItem>
+            <ListItem>Energy : {audioFeat.energy}</ListItem>
+            <ListItem>Instrumentalness : {audioFeat.instrumentalness}</ListItem>
+            <ListItem>Key : {audioFeat.key}</ListItem>
+            <ListItem>Liveness : {audioFeat.liveness}</ListItem>
+            <ListItem>Loudness : {audioFeat.loudness}</ListItem>
+            <ListItem>Speechiness : {audioFeat.speechiness}</ListItem>
+            <ListItem>Tempo : {audioFeat.tempo}</ListItem>
+            <ListItem>Time signature : {audioFeat.time_signature}</ListItem>
+            <ListItem>Valence : {audioFeat.valence}</ListItem>
           </UnorderedList>
         </Center>
       </Box>
     );
   }
-}
 
 export default TrackSearch;
