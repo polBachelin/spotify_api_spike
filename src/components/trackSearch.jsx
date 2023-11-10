@@ -1,7 +1,7 @@
 import {
   Box,
   Button,
-  Flex,
+  Center,
   Heading,
   Input,
   Link,
@@ -48,10 +48,12 @@ const TrackSearch = () => {
         `artist:${trackArtistInput} track:${trackInput}`
       )
 
-      const track = searchResult.tracks.items[0];
+      const track = searchResult.tracks.items[0]
 
       if (track) {
-        const audioFeatures = await spotifyApi.getAudioFeaturesForTrack(track.id);
+        const audioFeatures = await spotifyApi.getAudioFeaturesForTrack(
+          track.id
+        )
         setTrack(track)
         setAudioFeatures(audioFeatures)
       } else {
@@ -67,64 +69,6 @@ const TrackSearch = () => {
     } catch (error) {
       console.error("Error:", error.message)
     }
-  };
-
-    const CustomItem = React.forwardRef(({ children, ...rest }, ref) => (
-        <ListItem>{children}</ListItem>
-    ))
-    
-    return (
-      <Box>
-        <Center>
-            <Input 
-                w={{ base: "100%", md: "300px" }}
-                size='md'
-                placeholder="Enter track name"
-                value={trackInput}
-                onChange={handleTrackInput}
-            />
-            <Input 
-                w={{ base: "100%", md: "300px" }}
-                size='md'
-                placeholder="Enter artist name"
-                value={trackArtistInput}
-                onChange={handleArtistInput}
-            />
-            <Button onClick={handleSearch}>Search</Button>
-            <Button onClick={handleReset}>Reset</Button>
-        </Center>
-        <br></br>
-        <br></br>
-        <Center>
-            <Heading>Audio features of the track {track.name} </Heading>
-        </Center>
-        <Center>
-            <Link href={track.external_urls.spotify}>Link to song</Link>
-        </Center>
-        <br></br>
-        <Center>
-          <Text>Track ID : {track.id}</Text>
-        </Center>
-        <br></br>
-        <br></br>
-        <Center>
-          <UnorderedList>
-            <CustomItem>Acousticness : {audioFeat.acousticness}</CustomItem>
-            <ListItem>Danceability : {audioFeat.danceability}</ListItem>
-            <ListItem>Duration ms : {audioFeat.duration_ms}</ListItem>
-            <ListItem>Energy : {audioFeat.energy}</ListItem>
-            <ListItem>Instrumentalness : {audioFeat.instrumentalness}</ListItem>
-            <ListItem>Key : {audioFeat.key}</ListItem>
-            <ListItem>Liveness : {audioFeat.liveness}</ListItem>
-            <ListItem>Loudness : {audioFeat.loudness}</ListItem>
-            <ListItem>Speechiness : {audioFeat.speechiness}</ListItem>
-            <ListItem>Tempo : {audioFeat.tempo}</ListItem>
-            <ListItem>Time signature : {audioFeat.time_signature}</ListItem>
-            <ListItem>Valence : {audioFeat.valence}</ListItem>
-          </UnorderedList>
-        </Center>
-      </Box>
-    );
   }
 
   const CustomItem = React.forwardRef(({ children, ...rest }, ref) => (
@@ -133,7 +77,7 @@ const TrackSearch = () => {
 
   return (
     <Box>
-      <Flex paddingBottom={"30px"}>
+      <Center>
         <Input
           w={{ base: "100%", md: "300px" }}
           size="md"
@@ -149,15 +93,23 @@ const TrackSearch = () => {
           onChange={handleArtistInput}
         />
         <Button onClick={handleSearch}>Search</Button>
-      </Flex>
-      <Box>
+        <Button onClick={handleReset}>Reset</Button>
+      </Center>
+      <br></br>
+      <br></br>
+      <Center>
         <Heading>Audio features of the track {track.name} </Heading>
-        <Link isExternal color="teal" href={track.external_urls.spotify}>
-          Link to song
-        </Link>
-      </Box>
-      <Text>Track ID : {track.id}</Text>
-      <Flex paddingBottom={"30px"}>
+      </Center>
+      <Center>
+        <Link href={track.external_urls.spotify}>Link to song</Link>
+      </Center>
+      <br></br>
+      <Center>
+        <Text>Track ID : {track.id}</Text>
+      </Center>
+      <br></br>
+      <br></br>
+      <Center>
         <UnorderedList>
           <CustomItem>Acousticness : {audioFeat.acousticness}</CustomItem>
           <ListItem>Danceability : {audioFeat.danceability}</ListItem>
@@ -172,7 +124,7 @@ const TrackSearch = () => {
           <ListItem>Time signature : {audioFeat.time_signature}</ListItem>
           <ListItem>Valence : {audioFeat.valence}</ListItem>
         </UnorderedList>
-      </Flex>
+      </Center>
     </Box>
   )
 }
