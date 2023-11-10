@@ -1,6 +1,5 @@
-import { Center, ChakraProvider, Link } from "@chakra-ui/react"
+import { Center, ChakraProvider, Grid, GridItem, Link } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
-import SpotifyWebApi from "spotify-web-api-js"
 import "./App.css"
 import spotifyApi from "./components/SpotifyApi"
 import SpotifyPlaylist from "./components/SpotifyPlaylists"
@@ -23,8 +22,14 @@ function App() {
     } else {
       return (
         <>
-          <SpotifyPlaylist />
-          <TrackSearch />
+          <Grid templateColumns={"repeat(5, 1fr)"} gap={4}>
+            <GridItem colSpan={2}>
+              <TrackSearch />
+            </GridItem>
+            <GridItem colStart={3} colEnd={5}>
+              <SpotifyPlaylist />
+            </GridItem>
+          </Grid>
         </>
       )
     }

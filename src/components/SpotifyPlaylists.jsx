@@ -1,38 +1,40 @@
 import {
-  Box,
   Button,
+  Flex,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Text,
-  VStack,
+  Select,
+  Wrap,
   useDisclosure,
 } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
-import SpotifyWebApi from "spotify-web-api-js"
+import CheckboxPlaylist from "./CheckboxPlaylist"
 import spotifyApi from "./SpotifyApi"
+
+const AUDIO_OPTIONS = ["danceability", "energy", "valence"]
 
 function SpotifyPlaylist() {
   const [playlists, setPlaylists] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [playlistDanceability, setPlaylisDanceability] = useState({})
+  const [audioFeature, setAudioFeature] = useState(0)
 
   useEffect(() => {
-    fetchPlaylists()
-  }, [])
+    if (playlists.length === 0) {
+      fetchPlaylists()
+    }
+  }, [playlists.length])
 
   const fetchPlaylists = () => {
     spotifyApi.getUserPlaylists().then((response) => {
-      setPlaylists(response.items)
-    })
-  }
-
-  const addToQueue = (uri) => {
-    spotifyApi.queue(uri).then(() => {
-      alert("Playlist has been added to the queue!")
+      setPlaylists(
+        response.items.map((p) => {
+          return { ...p, isChecked: false }
+        })
+      )
     })
   }
 
@@ -48,54 +50,75 @@ function SpotifyPlaylist() {
       let features = await spotifyApi.getAudioFeaturesForTrack(track.track.id)
       pD.push({ track: track.track.uri, features: features })
     }
-    pD.sort((a, b) => b.features.danceability - a.features.danceability)
+    console.log(audioFeature)
+    pD.sort(
+      (a, b) =>
+        b.features[AUDIO_OPTIONS[audioFeature]] -
+        a.features[AUDIO_OPTIONS[audioFeature]]
+    )
     console.log(pD)
     pD.forEach((item) => {
-      spotifyApi.queue(item.track)
+      spotifyApi.queue(item.track).catch((err) => {
+        console.log(err)
+      })
     })
   }
 
-  const randomize = (id) => {
-    getAudioFeaturesOfPlaylist(id)
+  const randomize = () => {
+    console.log(playlists)
+    playlists.forEach((item) => {
+      if (item.isChecked) {
+        getAudioFeaturesOfPlaylist(item.id)
+      }
+    })
+  }
+
+  const handleSelectedChange = (event) => {
+    setAudioFeature(event.target.value)
   }
 
   return (
     <>
-      <Button
-        onClick={() => handleClick()}
-        key={"md"}
-        m={4}
-      >{`My playlists`}</Button>
-      <Modal onClose={onClose} isOpen={isOpen} size="md">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalHeader>{`Your playlists`}</ModalHeader>
-          <ModalBody>
-            <VStack spacing={2}>
-              {playlists.map((playlist, index) => (
-                <Box key={index} padding="5" borderWidth="1px">
-                  <Text fontSize="xl">{playlist.name}</Text>
-                  <Button
-                    onClick={() => addToQueue(playlist.uri)}
-                    colorScheme="teal"
-                    variant="outline"
-                  >
-                    Add to queue
-                  </Button>
-                  <Button
-                    onClick={() => randomize(playlist.id)}
-                    colorScheme="teal"
-                    variant="outline"
-                  >
-                    Randomize my playlist by Danceability
-                  </Button>
-                </Box>
-              ))}
-            </VStack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <Flex>
+        <Button
+          onClick={() => handleClick()}
+          key={"md"}
+          colorScheme="blue"
+          m={4}
+        >{`My playlists`}</Button>
+        <Modal onClose={onClose} isOpen={isOpen} size="xl">
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton />
+            <ModalHeader>{`Your playlists`}</ModalHeader>
+            <ModalBody>
+              <Wrap spacing={2}>
+                {playlists.map((p, i) => (
+                  <CheckboxPlaylist key={i} playlist={p} index={i} />
+                ))}
+              </Wrap>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </Flex>
+      <Flex>
+        <Select
+          placeholder="Select audio feature"
+          onChange={handleSelectedChange}
+          value={audioFeature}
+        >
+          {AUDIO_OPTIONS.map((o, index) => (
+            <option key={index} value={index}>
+              {o}
+            </option>
+          ))}
+        </Select>
+      </Flex>
+      <Flex>
+        <Button colorScheme="green" m={4} onClick={randomize}>
+          Randomize my queue based on selected audio feature & playlists
+        </Button>
+      </Flex>
     </>
   )
 }

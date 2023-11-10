@@ -1,7 +1,7 @@
 import {
   Box,
   Button,
-  Center,
+  Flex,
   Heading,
   Input,
   Link,
@@ -71,7 +71,7 @@ const TrackSearch = () => {
 
   return (
     <Box>
-      <Center>
+      <Flex paddingBottom={"30px"}>
         <Input
           w={{ base: "100%", md: "300px" }}
           size="md"
@@ -87,22 +87,15 @@ const TrackSearch = () => {
           onChange={handleArtistInput}
         />
         <Button onClick={handleSearch}>Search</Button>
-      </Center>
-      <br></br>
-      <br></br>
-      <Center>
+      </Flex>
+      <Box>
         <Heading>Audio features of the track {track.name} </Heading>
-      </Center>
-      <Center>
-        <Link href={track.external_urls.spotify}>Link to song</Link>
-      </Center>
-      <br></br>
-      <Center>
-        <Text>Track ID : {track.id}</Text>
-      </Center>
-      <br></br>
-      <br></br>
-      <Center>
+        <Link isExternal color="teal" href={track.external_urls.spotify}>
+          Link to song
+        </Link>
+      </Box>
+      <Text>Track ID : {track.id}</Text>
+      <Flex paddingBottom={"30px"}>
         <UnorderedList>
           <CustomItem>Acousticness : {audioFeat.acousticness}</CustomItem>
           <ListItem>Danceability : {audioFeat.danceability}</ListItem>
@@ -117,7 +110,7 @@ const TrackSearch = () => {
           <ListItem>Time signature : {audioFeat.time_signature}</ListItem>
           <ListItem>Valence : {audioFeat.valence}</ListItem>
         </UnorderedList>
-      </Center>
+      </Flex>
     </Box>
   )
 }
