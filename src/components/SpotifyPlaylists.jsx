@@ -63,6 +63,7 @@ function SpotifyPlaylist() {
           "It did not find a spotify player, make sure that you have spotify running"
         )
         console.log(err)
+        return
       })
     })
     alert("Check your spotify queue")
