@@ -57,14 +57,19 @@ function SpotifyPlaylist() {
         a.features[AUDIO_OPTIONS[audioFeature]]
     )
     console.log(pD)
-    pD.forEach((item) => {
-      spotifyApi.queue(item.track).catch((err) => {
-        alert(
-          "It did not find a spotify player, make sure that you have spotify running"
-        )
-        console.log(err)
-        return
-      })
+    pD.every((item) => {
+      spotifyApi
+        .queue(item.track)
+        .then((resp) => {
+          return true
+        })
+        .catch((err) => {
+          alert(
+            "It did not find a spotify player, make sure that you have spotify running"
+          )
+          console.log(err)
+          return false
+        })
     })
     alert("Check your spotify queue")
   }
