@@ -1,7 +1,7 @@
 import { Center, ChakraProvider, Grid, GridItem, Link } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import "./App.css"
-import spotifyApi from "./components/SpotifyApi"
+import spotifyApi, { setToken } from "./components/SpotifyApi"
 import SpotifyPlaylist from "./components/SpotifyPlaylists"
 import InfoDrawer from "./components/infoDrawer"
 import { loginUrl } from "./components/spotifyLogin"
@@ -52,8 +52,8 @@ function App() {
 
     if (_spotifyToken && spotifyToken === "") {
       setSpotifyToken(_spotifyToken)
-      spotifyApi.setAccessToken(_spotifyToken)
-    }
+      setToken(_spotifyToken)
+      }
   }, [spotifyToken])
 
   return (

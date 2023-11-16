@@ -14,6 +14,7 @@ import {
 import React, { useEffect, useState } from "react"
 import CheckboxPlaylist from "./CheckboxPlaylist"
 import spotifyApi from "./SpotifyApi"
+import { invalidToken } from "./SpotifyApi"
 
 const AUDIO_OPTIONS = ["danceability", "energy", "valence"]
 
@@ -21,6 +22,7 @@ function SpotifyPlaylist() {
   const [playlists, setPlaylists] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [audioFeature, setAudioFeature] = useState(0)
+  const [checkedPlaylists, setCheckedPlaylists] = useState([])
 
   useEffect(() => {
     if (playlists.length === 0) {
@@ -35,6 +37,8 @@ function SpotifyPlaylist() {
           return { ...p, isChecked: false }
         })
       )
+    }).catch((err) => {
+      invalidToken();
     })
   }
 
@@ -72,7 +76,6 @@ function SpotifyPlaylist() {
   }
 
   const randomize = () => {
-    console.log(playlists)
     playlists.forEach((item) => {
       if (item.isChecked) {
         getAudioFeaturesOfPlaylist(item.id)
