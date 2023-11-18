@@ -23,6 +23,7 @@ function SpotifyPlaylist() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [audioFeature, setAudioFeature] = useState(0)
   const [checkedPlaylists, setCheckedPlaylists] = useState([])
+  const [allTracks, setAllTracks] = useState([])
 
   useEffect(() => {
     if (playlists.length === 0) {
@@ -54,7 +55,6 @@ function SpotifyPlaylist() {
       let features = await spotifyApi.getAudioFeaturesForTrack(track.track.id)
       pD.push({ track: track.track.uri, features: features })
     }
-    console.log(audioFeature)
     pD.sort(
       (a, b) =>
         b.features[AUDIO_OPTIONS[audioFeature]] -
@@ -75,11 +75,40 @@ function SpotifyPlaylist() {
     alert("Check your spotify queue")
   }
 
-  const randomize = () => {
-    playlists.forEach((item) => {
+  const getActivePlaylistTracks = () => {
+    const tracks = playlists.map((item) => {
       if (item.isChecked) {
-        getAudioFeaturesOfPlaylist(item.id)
+        spotifyApi.getPlaylistTracks(item.id, {}, (err, res) => allTracks.push(res.items))
+        return true;
       }
+    })
+    return new Promise((res) => {return allTracks;})
+  }
+
+  const randomize = () => {
+    getActivePlaylistTracks().then(async (res) => {
+      const pD = []
+      for (const track of allTracks) {
+        let features = await spotifyApi.getAudioFeaturesForTrack(track.track.id)
+        pD.push({ track: track.track.uri, features: features })
+      }
+      pD.sort(
+        (a, b) =>
+          b.features[AUDIO_OPTIONS[audioFeature]] -
+          a.features[AUDIO_OPTIONS[audioFeature]]
+      )
+      pD.forEach((item) => {
+        spotifyApi
+          .queue(item.track)
+          .then((resp) => {
+            return true
+          })
+          .catch((err) => {
+            console.log(err)
+            return false
+          })
+      })
+      alert("Check your spotify queue")
     })
   }
 
