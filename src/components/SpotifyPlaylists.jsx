@@ -13,8 +13,7 @@ import {
 } from "@chakra-ui/react"
 import React, { useEffect, useState } from "react"
 import CheckboxPlaylist from "./CheckboxPlaylist"
-import spotifyApi from "./SpotifyApi"
-import { invalidToken } from "./SpotifyApi"
+import spotifyApi, { invalidToken } from "./SpotifyApi"
 
 const AUDIO_OPTIONS = ["danceability", "energy", "valence"]
 
@@ -22,97 +21,74 @@ function SpotifyPlaylist() {
   const [playlists, setPlaylists] = useState([])
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [audioFeature, setAudioFeature] = useState(0)
-  const [checkedPlaylists, setCheckedPlaylists] = useState([])
-  const [allTracks, setAllTracks] = useState([])
+  const [playlistFetched, setPlaylistFetched] = useState(false)
 
   useEffect(() => {
-    if (playlists.length === 0) {
+    if (!playlistFetched) {
       fetchPlaylists()
     }
-  }, [playlists.length])
+  }, [playlistFetched])
 
-  const fetchPlaylists = () => {
-    spotifyApi.getUserPlaylists().then((response) => {
+  const fetchPlaylists = async () => {
+    try {
+      const response = await spotifyApi.getUserPlaylists()
       setPlaylists(
         response.items.map((p) => {
           return { ...p, isChecked: false }
         })
       )
-    }).catch((err) => {
-      invalidToken();
-    })
+      setPlaylistFetched(true)
+    } catch (err) {
+      invalidToken()
+    }
   }
 
   const handleClick = () => {
     onOpen()
   }
 
-  const getAudioFeaturesOfPlaylist = async (id) => {
-    const tracks = await spotifyApi.getPlaylistTracks(id)
-
-    const pD = []
-    for (const track of tracks.items) {
-      let features = await spotifyApi.getAudioFeaturesForTrack(track.track.id)
-      pD.push({ track: track.track.uri, features: features })
-    }
-    pD.sort(
-      (a, b) =>
-        b.features[AUDIO_OPTIONS[audioFeature]] -
-        a.features[AUDIO_OPTIONS[audioFeature]]
+  const getActivePlaylistTracks = async () => {
+    const activePlaylists = playlists.filter((p) => p.isChecked)
+    const trackPromises = activePlaylists.map((playlist) =>
+      spotifyApi.getPlaylistTracks(playlist.id)
     )
-    console.log(pD)
-    pD.forEach((item) => {
-      spotifyApi
-        .queue(item.track)
-        .then((resp) => {
-          return true
-        })
-        .catch((err) => {
-          console.log(err)
-          return false
-        })
-    })
-    alert("Check your spotify queue")
+    const trackResponses = await Promise.all(trackPromises)
+    return trackResponses.flatMap((response) => response.items)
   }
 
-  const getActivePlaylistTracks = () => {
-    const tracks = playlists.map((item) => {
-      if (item.isChecked) {
-        spotifyApi.getPlaylistTracks(item.id, {}, (err, res) => allTracks.push(res.items))
-        return true;
-      }
-    })
-    return new Promise((res) => {return allTracks;})
-  }
+  const randomize = async () => {
+    try {
+      const tracks = await getActivePlaylistTracks()
+      const trackFeaturesPromises = tracks.map((track) =>
+        spotifyApi.getAudioFeaturesForTrack(track.track.id)
+      )
+      const tracksFeatures = await Promise.all(trackFeaturesPromises)
 
-  const randomize = () => {
-    getActivePlaylistTracks().then(async (res) => {
-      const pD = []
-      for (const track of allTracks) {
-        let features = await spotifyApi.getAudioFeaturesForTrack(track.track.id)
-        pD.push({ track: track.track.uri, features: features })
-      }
-      pD.sort(
-        (a, b) =>
+      const pD = tracksFeatures.map((features, index) => ({
+        track: tracks[index].track.uri,
+        features,
+      }))
+      pD.sort((a, b) => {
+        console.log(b.features[AUDIO_OPTIONS[audioFeature]])
+        return (
           b.features[AUDIO_OPTIONS[audioFeature]] -
           a.features[AUDIO_OPTIONS[audioFeature]]
-      )
-      pD.forEach((item) => {
-        spotifyApi
-          .queue(item.track)
-          .then((resp) => {
-            return true
-          })
-          .catch((err) => {
-            console.log(err)
-            return false
-          })
+        )
       })
-      alert("Check your spotify queue")
-    })
+
+      for (const item of pD) {
+        await spotifyApi.queue(item.track)
+      }
+
+      alert("Check your Spotify queue")
+    } catch (err) {
+      console.error(err)
+      alert("An error occurred while randomizing your queue")
+    }
   }
 
   const handleSelectedChange = (event) => {
+    console.log(playlists.filter((p) => p.isChecked))
     setAudioFeature(event.target.value)
   }
 

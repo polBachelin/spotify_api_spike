@@ -11,7 +11,7 @@ function CheckboxPlaylist({ playlist, index }) {
 
   return (
     <WrapItem key={index} padding="5" borderWidth="1px">
-      <Checkbox onChange={(e) => handleChange(e)} isChecked={playlist[index].isChecked}>
+      <Checkbox onChange={(e) => handleChange(e)} isChecked={selected}>
         {playlist.name}
       </Checkbox>
     </WrapItem>
